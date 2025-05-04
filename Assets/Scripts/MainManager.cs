@@ -12,6 +12,7 @@ public class MainManager : MonoBehaviour
 
     public Text ScoreText;
     public GameObject GameOverText;
+    public GameObject BackButton;
     
     private bool m_Started = false;
     private int m_Points;
@@ -72,5 +73,11 @@ public class MainManager : MonoBehaviour
     {
         m_GameOver = true;
         GameOverText.SetActive(true);
+        BackButton.SetActive(true);
+    }
+    
+    public void OnClicBack()
+    {
+        SceneManager.LoadScene(0);
     }
 }
