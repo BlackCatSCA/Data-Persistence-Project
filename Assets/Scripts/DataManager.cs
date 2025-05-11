@@ -6,8 +6,9 @@ public class DataManager : MonoBehaviour
 {
     public static DataManager Instance;
 
-    public string playerName { get; internal set; }
-    public int mScore {  get; internal set; }
+    public Dictionary<string, int> playerScores = new Dictionary<string, int>();
+    public string currentPlayerName;
+
 
     private void Awake()
     {

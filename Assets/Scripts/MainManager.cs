@@ -17,16 +17,18 @@ public class MainManager : MonoBehaviour
     public GameObject BackButton;
     
     private bool m_Started = false;
-    private int m_Points;
+    private int m_Points = 0;
     
     private bool m_GameOver = false;
 
-    string playerName = DataManager.Instance?.playerName ?? "Jugador Desconocido";
+    private string currentPlayer;
 
 
     // Start is called before the first frame update
     void Start()
     {
+        MaxPlayerScore();
+
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
         
@@ -41,6 +43,8 @@ public class MainManager : MonoBehaviour
                 brick.onDestroyed.AddListener(AddPoint);
             }
         }
+
+        currentPlayer = DataManager.Instance.currentPlayerName;
     }
 
     private void Update()
@@ -65,22 +69,51 @@ public class MainManager : MonoBehaviour
                 SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
             }
         }
+
     }
 
     void AddPoint(int point)
     {
         m_Points += point;
-        ScoreText.text = $"{playerName} Score : {m_Points} : ";
+        ScoreText.text = $" {currentPlayer} Score : {m_Points} : ";
 
-        if (DataManager.Instance != null)
+    }
+
+    public void MaxPlayerScore()
+    {
+        if (DataManager.Instance == null || DataManager.Instance.playerScores.Count == 0)
         {
-            DataManager.Instance.mScore = m_Points;
+            bestScoreName.text = "No hay puntajes registrados.";
+            return;
         }
+
+        string topPlayer = "";
+        int maxScore = 0;
+
+        // Iterar sobre el diccionario para encontrar el jugador con el mayor puntaje.
+        foreach (var player in DataManager.Instance.playerScores)
+        {
+            if (player.Value > maxScore)
+            {
+                maxScore = player.Value;
+                topPlayer = player.Key;
+            }
+        }
+
+        // Mostrar el nombre del mejor jugador y su puntaje en el UI Text.
+        bestScoreName.text = $"Mejor jugador: {topPlayer} - {maxScore} puntos";
+    }
+
+
+    public void SaveScore()
+    {
+        DataManager.Instance.SavePlayerScore(m_Points);
     }
 
     public void GameOver()
     {
         m_GameOver = true;
+        SaveScore();
         GameOverText.SetActive(true);
         BackButton.SetActive(true);
     }
@@ -89,4 +122,6 @@ public class MainManager : MonoBehaviour
     {
         SceneManager.LoadScene(0);
     }
+
+
 }

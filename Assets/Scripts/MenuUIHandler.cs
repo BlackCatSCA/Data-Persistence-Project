@@ -9,17 +9,13 @@ using UnityEngine.UI;
 [DefaultExecutionOrder(1000)]
 public class MenuUIHandler : MonoBehaviour
 {
-    public InputField inputField;
-    public string namePlayer;
-    public Text bestNameScore;
-
-    string bestPlayerName = DataManager.Instance?.playerName ?? "Jugador Desconocido";
-    int bestsScore = DataManager.Instance?.mScore ?? 00;
-
+    public InputField nameInput;
+    public string playerName;
+    public Text scoreText;
     // Start is called before the first frame update
     void Start()
     {
-        BestScore();
+        DisplayScores();
     }
 
     // Update is called once per frame
@@ -30,20 +26,31 @@ public class MenuUIHandler : MonoBehaviour
 
     public void ReadInput()
     {
-        if (inputField != null)
-        {
-            namePlayer = inputField.text;
-            Debug.Log("El usuario ingreso: " + namePlayer);
-        }
-        if(DataManager.Instance != null)
-        {
-            DataManager.Instance.playerName = namePlayer;
-        }
+        playerName = nameInput.text;
+        Debug.Log("El usuario ingreso: " + playerName);
+        DataManager.Instance.SetCurrentPlayer(playerName);
+        DataManager.Instance.SavePlayerScore(0);
     }
 
-    void BestScore()
-    { 
-        bestNameScore.text = $" Best Player Score: {bestPlayerName} : {bestsScore} ";  
+    public void DisplayScores()
+    {
+        // Verifica si existe la instancia de DataManager.
+        if (DataManager.Instance == null || DataManager.Instance.playerScores.Count == 0)
+        {
+            scoreText.text = "No hay puntajes registrados.";
+            return;
+        }
+
+        string scoreList = "Puntajes más altos:\n";
+
+        // Itera sobre cada jugador en el diccionario de puntajes.
+        foreach (var player in DataManager.Instance.playerScores)
+        {
+            scoreList += $"{player.Key}: {player.Value} puntos\n"; // Agrega nombre y puntaje.
+        }
+
+        // Asigna el texto generado al objeto UI Text.
+        scoreText.text = scoreList;
     }
 
     public void OnClicStart()
